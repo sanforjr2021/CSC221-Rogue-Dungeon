@@ -2,4 +2,9 @@
 # Date: 10/1/19
 # Description: Load the basic Code
 
-print("This is the first version")
+def main():
+    print("Ain't this a great game!")
+
+
+if __name__ == '__main__':
+    main()
