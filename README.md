@@ -7,7 +7,7 @@ A Basic Rogue Dungeon Game in Python
 
 
  ### Current Features
- - None - Were you expecting this to actually do something? 
+ - None
  
 
 ------------
@@ -22,20 +22,12 @@ A Basic Rogue Dungeon Game in Python
        - Traps
     - Tile based setup
  - Hero
-    - Health and stats
     - Able to move around the dungeon
-    - Inventory with items and gold
-    - Can only view in a certain radius(darkening rooms)
     - Can attack enemies
- - Items
-    - Random items that add to player stats
-    - Can give new abilities.
-    - Can be sold for gold
  - Enemies
     - Enemies will attack the player
-    - Will drop gold and sometimes items and even keys
+    - Will drop gold and keys
   - Custom GUI
   - Keyboard Input.
     - WASD is used to move.
-    - E can interact
     - Spacebar is used to attack. 
