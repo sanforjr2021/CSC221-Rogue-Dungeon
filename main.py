@@ -3,6 +3,12 @@
 # Description: Load the basic Code
 
 def main():
+    try:
+        import pygame
+        print("PyGame is installed")
+    except ImportError:
+        print("Error: pygame not installed")
+        print("py -m pip install -U pygame --user")
     print("Ain't this a great game!")
 
 
