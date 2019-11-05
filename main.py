@@ -3,12 +3,15 @@
 # Description: Load the basic Code
 
 def main():
+    window = createWindow()
+			
+def createWindow():
     pygame.init()
     # load and set the logo
-    pygame.display.set_caption("minimal program")
+    pygame.display.set_caption("UMU Rogue Dungeon")
 
-    # create a surface on screen that has the size of 240 x 180
-    screen = pygame.display.set_mode((240, 180))
+    # create a surface on screen that has the size of 1080 x 720
+    screen = pygame.display.set_mode((1080, 720))
 
     # define a variable to control the main loop
     running = True
