@@ -1,3 +1,5 @@
+# A list of colors that can be called for a standard look
+
 black = (0, 0, 0)
 gray = (128, 128, 128)
 white = (255, 255, 255)

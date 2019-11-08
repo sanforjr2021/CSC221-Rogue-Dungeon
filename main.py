@@ -4,13 +4,27 @@
 
 import sys
 import colors
+import grid
 
 def main():
+    try:
+        # Choose the size of the grid (width, height)
+        g = grid.Grid(5, 7)
+    except (grid.InvalidInputError, TypeError):
+        print('The parameters of the grid size must be positive integers')
+    except NameError:
+        print('An error occurred because an unsupported character was used in the parameters of the grid size')
+    
     pygame.init()
     
     # Create the window, saving it to a variable.
     surface = pygame.display.set_mode((350, 250), pygame.RESIZABLE)
     pygame.display.set_caption("Rogue Dungeon")
+    try:
+        icon = pygame.image.load('rd-logo.png')
+        pygame.display.set_icon(icon)
+    except pygame.error:
+        print('Could not load logo')
     
     # The factor at which the tiles are divided from the window size
     divFactor = 10
@@ -23,7 +37,7 @@ def main():
         
         # Background fill color
         surface.fill(colors.black)
-        
+
         drawPlayer(surface, tileSize)
         
         """ DRAW OBJECTS BEFORE HERE """
@@ -58,7 +72,7 @@ def drawPlayer(surface, tileSize):
     x = surface.get_width()/2 - tileSize/2
     y = surface.get_height()/2 - tileSize/2
     pygame.draw.rect(surface, colors.red, (x, y, tileSize, tileSize))
-    
+        
 
 
 if __name__ == '__main__':
