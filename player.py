@@ -29,3 +29,7 @@ class Player:
         
     def receivePoints(self, amount):
         self.score = self.score + amount
+        
+if __name__ == '__main__':
+    print("This file can't be run on its own. Please run main.py")
+    quit()

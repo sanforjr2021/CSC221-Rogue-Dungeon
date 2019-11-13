@@ -11,3 +11,7 @@ yellow = (255, 255, 0)
 aqua = (0, 255, 255)
 orange = (255, 128, 0)
 pink = (255, 0, 128)
+
+if __name__ == '__main__':
+    print("This file can't be run on its own. Please run main.py")
+    quit()

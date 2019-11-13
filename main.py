@@ -2,121 +2,98 @@
 # Date: 10/1/19
 # Description: Load the basic Code
 
-import sys
-import colors
-import grid
-import player
+import pygame
+import graphicswindow
 
 class Main:
     def __init__(self):
-    #    try:
-    #        # Choose the size of the grid (width, height)
-    #        g = grid.Grid(5, 7)
-    #    except (grid.InvalidInputError, TypeError):
-    #        print('The parameters of the grid size must be positive integers')
-    #    except NameError:
-    #        print('An error occurred because an unsupported character was used in the parameters of the grid size')
+        self.menu_map = {
+			"play": self.play,
+			"instructions": self.instructions,
+			"quit": self.quit,
+		}
+    
+        print()
+        self.printLogo()
+        print()
         
-        pygame.init()
-        
-        self.createWindow()
-        
-        # The factor at which the tiles are divided from the window size
-        self.divFactor = 10
-        
-        self.player = player.Player(0, 0, 0, 3)
-
         while True:
-            self.calculateTileSize()
-            
-            self.drawOnWindow()
-            
-            # Updates the objects being displayed
-            pygame.display.update()
-            
-            # Runs listeners for various inputs
-            self.runListeners()
-               
-    def calculateTileSize(self):
-        # Calculates the size of each tile by determining if the width or height is smallest
-        if self.surface.get_height() < self.surface.get_width():
-            self.tileSize = self.surface.get_height()/self.divFactor
-        else:
-            self.tileSize = self.surface.get_width()/self.divFactor
+            self.printOptions()
+            print()
+            answer = input("Please enter a command: ").lower()
+            try:
+                func = self.menu_map[answer]
+            except KeyError:
+                print()
+                print("{} is not a valid option".format(answer))
+                print()
+            else:
+                func()
     
-    def createWindow(self):
-        # Create the window and change settings
-        self.surface = pygame.display.set_mode((350, 350), pygame.RESIZABLE)
-        pygame.display.set_caption("Rogue Dungeon")
-        try:
-            self.icon = pygame.image.load('rd-logo.png')
-            pygame.display.set_icon(self.icon)
-        except pygame.error:
-            print('Could not load logo')
-      
-    def runListeners(self):
-        # For loop to detect event changes
-        for event in pygame.event.get():
-            # Shuts everything down if the program closes
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            
-            # Listens for specific key presses
-            if event.type == pygame.KEYDOWN:
-                # Closes the program if the escape key is pressed
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-                    
-                # Moves player to the right as long as they are within the grid boundaries
-                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
-                    self.player.moveRight()
-                
-                # Moves player to the left as long as they are within the grid boundaries
-                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.player.x > 0:
-                    self.player.moveLeft()
-                    
-                # Moves player up as long as they are within the grid boundaries
-                if (event.key == pygame.K_UP or event.key == pygame.K_w) and self.player.y > 0:
-                    self.player.moveUp()
-                    
-                # Moves player down as long as they are within the grid boundaries
-                if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.player.y < self.divFactor - 1:
-                    self.player.moveDown()
-
-            # Refreshes window if size changes
-            if event.type == pygame.VIDEORESIZE:
-                self.surface = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-            
-#=======================================================#
-#DRAWING FUNCTIONS#
-    def drawOnWindow(self):
-        # Background fill color
-        self.surface.fill(colors.black)
+    def play(self):
+        graphicswindow.GraphicsWindow()
         
-        self.drawGrid()
-        self.drawPlayer()
-    
-    def drawGrid(self):
-        # Draws a grid of specified size
-        for y in range(self.divFactor):
-                for x in range(self.divFactor):
-                    rect = pygame.Rect(x*self.tileSize, y*self.tileSize, self.tileSize, self.tileSize)
-                    pygame.draw.rect(self.surface, colors.blue, rect, 1)
-    
-    def drawPlayer(self):
-        rect = pygame.Rect(self.player.x*self.tileSize, self.player.y*self.tileSize, self.tileSize, self.tileSize)
-        pygame.draw.rect(self.surface, colors.red, rect)
-#=======================================================# 
+    def instructions(self):
+        print()
+        print("===============================================================================")
+        print()
+        print("The objective of the game is to obtain points while avoiding death. You can get")
+        print("points by killing monsters or collecting loot in a level.")
+        print()
+        print("The game remains static until you move the player character. This means that")
+        print("monsters can't move until you choose to move. Therefore, you should be strategic")
+        print("about every move you make.")
+        print()
+        print("You will take damage by moving onto the same tile or staying within one tile of")
+        print("a monster. If you receive too much damage, your character will die and the game")
+        print("will end.")
+        print()
+        print("                         Controls")
+        print("    W or ↑  :  Move Up            S or ↓  :  Move Down")
+        print("    A or ←  :  Move Left          D or →  :  Move Right")
+        print("    E       :  Attack             Esc     :  Exit Game")
+        print()
+        print("===============================================================================")
+        print()
         
-
+    def quit(self):
+        raise SystemExit()
+        
+    def printLogo(self):
+        print("            ▄████████  ▄██████▄     ▄██████▄  ███    █▄     ▄████████ ")
+        print("           ███    ███ ███    ███   ███    ███ ███    ███   ███    ███ ")
+        print("           ███    ███ ███    ███   ███    █▀  ███    ███   ███    █▀  ")
+        print("          ▄███▄▄▄▄██▀ ███    ███  ▄███        ███    ███  ▄███▄▄▄     ")
+        print("         ▀▀███▀▀▀▀▀   ███    ███ ▀▀███ ████▄  ███    ███ ▀▀███▀▀▀     ")
+        print("         ▀███████████ ███    ███   ███    ███ ███    ███   ███    █▄  ")
+        print("           ███    ███ ███    ███   ███    ███ ███    ███   ███    ███ ")
+        print("           ███    ███  ▀██████▀    ████████▀  ████████▀    ██████████ ")
+        print("           ███    ███                                                 ")
+        print()
+        print("████████▄  ███    █▄  ███▄▄▄▄      ▄██████▄     ▄████████  ▄██████▄  ███▄▄▄▄   ")
+        print("███   ▀███ ███    ███ ███▀▀▀██▄   ███    ███   ███    ███ ███    ███ ███▀▀▀██▄ ")
+        print("███    ███ ███    ███ ███   ███   ███    █▀    ███    █▀  ███    ███ ███   ███ ")
+        print("███    ███ ███    ███ ███   ███  ▄███         ▄███▄▄▄     ███    ███ ███   ███ ")
+        print("███    ███ ███    ███ ███   ███ ▀▀███ ████▄  ▀▀███▀▀▀     ███    ███ ███   ███ ")
+        print("███    ███ ███    ███ ███   ███   ███    ███   ███    █▄  ███    ███ ███   ███ ")
+        print("███   ▄███ ███    ███ ███   ███   ███    ███   ███    ███ ███    ███ ███   ███ ")
+        print("████████▀  ████████▀   ▀█   █▀    ████████▀    ██████████  ▀██████▀   ▀█   █▀  ")
+        print()
+        print("                   Created by Alec Barker and Jacob Sanford                    ")
+        
+    def printOptions(self):
+        print("                            Please enter a command:                            ")
+        print("                                      Play                                     ")
+        print("                                  Instructions                                 ")
+        print("                                      Quit                                     ")
+        
+        
 
 if __name__ == '__main__':
     try:
         import pygame
     except ImportError:
-        print("Error: pygame not installed")
-        print("Type this to install pygame on a windows machine: py -m pip install -U pygame --user")
+        print("Error: pygame not installed. Please type the following to install pygame on a Windows machine:")
+        print("py -m pip install -U pygame --user")
         quit()
     Main()
