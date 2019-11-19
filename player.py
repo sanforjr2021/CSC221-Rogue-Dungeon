@@ -22,7 +22,7 @@ class Player:
     def moveDown(self):
         self.y = self.y + 1
         
-    def playerHurt(self):
+    def hurtPlayer(self):
         self.health = self.health - 1
         if self.health <= 0:
             self.isDead = True

@@ -1,6 +1,5 @@
 import sys
 import colors
-import grid
 import player
 import pygame
 
@@ -18,8 +17,9 @@ class GraphicsWindow:
 
         while True:
             self.calculateTileSize()
+            self.calculateFontSize()
             
-            self.drawOnWindow()
+            self.draw()
             
             # Updates the objects being displayed
             pygame.display.update()
@@ -30,13 +30,20 @@ class GraphicsWindow:
     def calculateTileSize(self):
         # Calculates the size of each tile by determining if the width or height is smallest
         if self.surface.get_height() < self.surface.get_width():
-            self.tileSize = self.surface.get_height()/self.divFactor
+            self.tileSize = self.surface.get_height()/(self.divFactor + 2)
         else:
             self.tileSize = self.surface.get_width()/self.divFactor
+            
+    def calculateFontSize(self):
+        # Calculates the size of the font based on the window size
+        if self.surface.get_height() < self.surface.get_width():
+            self.fontSize = int(self.surface.get_height()/self.divFactor/1.5)
+        else:
+            self.fontSize = int(self.surface.get_width()/self.divFactor/1.5)
     
     def createWindow(self):
         # Create the window and change settings
-        self.surface = pygame.display.set_mode((350, 350), pygame.RESIZABLE)
+        self.surface = pygame.display.set_mode((350, 420), pygame.RESIZABLE)
         pygame.display.set_caption("Rogue Dungeon")
         try:
             self.icon = pygame.image.load('rd-logo.png')
@@ -81,12 +88,22 @@ class GraphicsWindow:
             
 #=======================================================#
 #DRAWING FUNCTIONS#
-    def drawOnWindow(self):
+    def draw(self):
         # Background fill color
         self.surface.fill(colors.black)
         
         self.drawGrid()
         self.drawPlayer()
+        self.drawText()
+        
+    def drawText(self):
+        font = pygame.font.SysFont('Tahoma', self.fontSize)
+        
+        health = font.render('Health: ' + str(self.player.health), True, (255, 255, 0))
+        self.surface.blit(health, (0 + self.tileSize/4, self.tileSize*self.divFactor))
+        
+        score = font.render('Score: ' + str(self.player.score), True, (255, 255, 0))
+        self.surface.blit(score, (0 + self.tileSize/4, self.tileSize*self.divFactor + self.tileSize))
     
     def drawGrid(self):
         # Draws a grid of specified size
@@ -94,6 +111,9 @@ class GraphicsWindow:
                 for x in range(self.divFactor):
                     rect = pygame.Rect(x*self.tileSize, y*self.tileSize, self.tileSize, self.tileSize)
                     pygame.draw.rect(self.surface, colors.blue, rect, 1)
+        
+        rect = pygame.Rect(0, self.tileSize*self.divFactor, self.tileSize*self.divFactor, self.tileSize*2)
+        pygame.draw.rect(self.surface, colors.blue, rect, 1)
     
     def drawPlayer(self):
         rect = pygame.Rect(self.player.x*self.tileSize, self.player.y*self.tileSize, self.tileSize, self.tileSize)
