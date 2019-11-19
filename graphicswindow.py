@@ -1,6 +1,5 @@
 import sys
 import colors
-import grid
 import player
 import pygame
 
