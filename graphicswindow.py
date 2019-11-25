@@ -2,6 +2,8 @@ import sys
 import colors
 import player
 import pygame
+import enemy
+
 
 class GraphicsWindow:
         
@@ -14,7 +16,7 @@ class GraphicsWindow:
         self.divFactor = 10
         
         self.player = player.Player(0, 0, 0, 3)
-
+        self.enemy = enemy.Enemy(5, 5, self.divFactor)
         while True:
             self.calculateTileSize()
             self.calculateFontSize()
@@ -69,32 +71,36 @@ class GraphicsWindow:
                 # Moves player to the right as long as they are within the grid boundaries
                 if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
                     self.player.moveRight()
-                
+                    self.calculateCPUMovement()
                 # Moves player to the left as long as they are within the grid boundaries
                 if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.player.x > 0:
                     self.player.moveLeft()
-                    
+                    self.calculateCPUMovement()
                 # Moves player up as long as they are within the grid boundaries
                 if (event.key == pygame.K_UP or event.key == pygame.K_w) and self.player.y > 0:
                     self.player.moveUp()
-                    
+                    self.calculateCPUMovement()
                 # Moves player down as long as they are within the grid boundaries
                 if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.player.y < self.divFactor - 1:
                     self.player.moveDown()
+                    self.calculateCPUMovement()
 
             # Refreshes window if size changes
             if event.type == pygame.VIDEORESIZE:
                 self.surface = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-            
+
+    def calculateCPUMovement(self):
+        self.enemy.randomMovement()
+
 #=======================================================#
 #DRAWING FUNCTIONS#
     def draw(self):
         # Background fill color
         self.surface.fill(colors.black)
-        
         self.drawGrid()
         self.drawPlayer()
         self.drawText()
+        self.drawEnemy()
         
     def drawText(self):
         font = pygame.font.SysFont('Tahoma', self.fontSize)
@@ -117,5 +123,9 @@ class GraphicsWindow:
     
     def drawPlayer(self):
         rect = pygame.Rect(self.player.x*self.tileSize, self.player.y*self.tileSize, self.tileSize, self.tileSize)
+        pygame.draw.rect(self.surface, colors.green, rect)
+
+    def drawEnemy(self):
+        rect = pygame.Rect(self.enemy.x*self.tileSize, self.enemy.y*self.tileSize, self.tileSize, self.tileSize)
         pygame.draw.rect(self.surface, colors.red, rect)
 #=======================================================# 
