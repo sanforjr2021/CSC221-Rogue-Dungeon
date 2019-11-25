@@ -6,14 +6,10 @@ class Enemy:
         self.x = x
         self.y = y
         self.limit = limit
-        self.isDead = False
         self.movement = {0: self.moveRight, 1: self.moveLeft, 2: self.moveUp, 3: self.moveDown, 4: self.idle}
 
-    def setDead(self):
-        self.isDead = True
-
     def moveRight(self):
-        if self.x < self.limit -1:
+        if self.x < self.limit - 1:
             self.x = self.x + 1
 
     def moveLeft(self):
@@ -34,6 +30,7 @@ class Enemy:
     def randomMovement(self):
         direction = self.movement.get(random.randint(0, 4))
         direction()
+
 
 if __name__ == '__main__':
     print("This file can't be run on its own. Please run main.py")
