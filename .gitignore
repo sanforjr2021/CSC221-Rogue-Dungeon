@@ -125,3 +125,4 @@ venv/
 .idea/
 *.xml
 .idea/workspace.xml
+/.idea/
