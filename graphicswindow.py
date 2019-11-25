@@ -69,7 +69,7 @@ class GraphicsWindow:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                if not self.player.isDead: #Check if player is not dead
+                if not self.player.isDead:  # Check if player is not dead
                     # Moves player to the right as long as they are within the grid boundaries
                     if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
                         self.player.moveRight()
@@ -86,14 +86,15 @@ class GraphicsWindow:
                     if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.player.y < self.divFactor - 1:
                         self.player.moveDown()
                         self.calculateCPUMovement()
-                    # The player attacks any target in each direction touching him and gain 50 points for each one killed.
+                    # The player attacks any target in each direction touching him
                     if event.key == pygame.K_e:
+                        self.calculateCPUMovement()
                         for theEnemy in self.enemies:
-                            if (theEnemy.x == self.player.x + 1 or theEnemy.x == self.player.x - 1) and (
-                                    theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1):
+                            if (theEnemy.x == self.player.x + 1 or theEnemy.x == self.player.x - 1 or theEnemy.x == self.player.x)\
+                                    and (theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1 or theEnemy.y == self.player.y):
                                 self.enemies.remove(theEnemy)
                                 self.player.receivePoints(50)
-                        self.calculateCPUMovement()
+
 
             # Refreshes window if size changes
             if event.type == pygame.VIDEORESIZE:
@@ -102,7 +103,18 @@ class GraphicsWindow:
     def calculateCPUMovement(self):
         for theEnemy in self.enemies:
             # Move the enemy
-            theEnemy.randomMovement()
+            try:
+                x = theEnemy.x
+                y = theEnemy.y
+                theEnemy.randomMovement()
+                for theOtherEnemy in self.enemies:
+                    if theEnemy.x == theOtherEnemy.x and theEnemy.y == theOtherEnemy.y and theEnemy != theOtherEnemy:
+                        theEnemy.x = x
+                        theEnemy.y = y
+                        raise StackedEnemyError
+            except StackedEnemyError:
+                print("Enemy moved on top of enemy in line 111")
+                pass
             # Detect if it hits the player
             if theEnemy.x == self.player.x and theEnemy.y == self.player.y:
                 self.enemies.remove(theEnemy)
@@ -110,14 +122,24 @@ class GraphicsWindow:
                 self.player.receivePoints(-100)
 
     def generateEnemies(self, numOfEnemies):
-        # TODO:Check that it does not spawn on the player.
         for x in range(numOfEnemies):
-            self.enemies.append(enemy.Enemy(
-                random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), self.divFactor
-            ))
-
-# =======================================================#
-# DRAWING FUNCTIONS#
+            try:
+                tempEnemy = enemy.Enemy(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), self.divFactor)
+                # Check to see if the enemy spawned on the player
+                if tempEnemy.x == self.player.x and tempEnemy.y == self.player.y:
+                    raise StackedEnemyError
+                # Check to see if the enemy spawned ontop of another enemy
+                for theEnemy in self.enemies:
+                    if theEnemy.x == tempEnemy.x and theEnemy.y == tempEnemy.y:
+                        raise StackedEnemyError
+                self.enemies.append(tempEnemy)
+            except StackedEnemyError:
+                # Force the program to regenerate an enemy in said spot.
+                print("Error generating an enemy from line 133")
+                self.generateEnemies(1)
+    # =======================================================#
+    # DRAWING FUNCTIONS#
+    # =======================================================#
 
     def draw(self):
         # Background fill color
@@ -159,4 +181,12 @@ class GraphicsWindow:
         for theEnemy in self.enemies:
             rect = pygame.Rect(theEnemy.x * self.tileSize, theEnemy.y * self.tileSize, self.tileSize, self.tileSize)
             pygame.draw.rect(self.surface, colors.red, rect)
+
+
 # =======================================================#
+# Exceptions
+# ========================================================#
+
+class StackedEnemyError(Exception):
+    """ An Exception to detect if an enemy was moved onto another enemy."""
+    pass
