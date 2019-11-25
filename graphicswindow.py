@@ -18,7 +18,7 @@ class GraphicsWindow:
 
         self.player = player.Player(0, 0, 0, 3)
         self.enemies = []
-        self.generateEnemies(3)
+        self.generateEnemies(4)
         while True:
             self.calculateTileSize()
             self.calculateFontSize()
@@ -69,31 +69,31 @@ class GraphicsWindow:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-
-                # Moves player to the right as long as they are within the grid boundaries
-                if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
-                    self.player.moveRight()
-                    self.calculateCPUMovement()
-                # Moves player to the left as long as they are within the grid boundaries
-                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.player.x > 0:
-                    self.player.moveLeft()
-                    self.calculateCPUMovement()
-                # Moves player up as long as they are within the grid boundaries
-                if (event.key == pygame.K_UP or event.key == pygame.K_w) and self.player.y > 0:
-                    self.player.moveUp()
-                    self.calculateCPUMovement()
-                # Moves player down as long as they are within the grid boundaries
-                if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.player.y < self.divFactor - 1:
-                    self.player.moveDown()
-                    self.calculateCPUMovement()
-                # The player attacks any target in each direction touching him and gain 50 points for each one killed.
-                if event.key == pygame.K_e:
-                    for theEnemy in self.enemies:
-                        if (theEnemy.x == self.player.x + 1 or theEnemy.x == self.player.x - 1) and (
-                                theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1):
-                            self.enemies.remove(theEnemy)
-                            self.player.receivePoints(50)
-                    self.calculateCPUMovement()
+                if not self.player.isDead: #Check if player is not dead
+                    # Moves player to the right as long as they are within the grid boundaries
+                    if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
+                        self.player.moveRight()
+                        self.calculateCPUMovement()
+                    # Moves player to the left as long as they are within the grid boundaries
+                    if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.player.x > 0:
+                        self.player.moveLeft()
+                        self.calculateCPUMovement()
+                    # Moves player up as long as they are within the grid boundaries
+                    if (event.key == pygame.K_UP or event.key == pygame.K_w) and self.player.y > 0:
+                        self.player.moveUp()
+                        self.calculateCPUMovement()
+                    # Moves player down as long as they are within the grid boundaries
+                    if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.player.y < self.divFactor - 1:
+                        self.player.moveDown()
+                        self.calculateCPUMovement()
+                    # The player attacks any target in each direction touching him and gain 50 points for each one killed.
+                    if event.key == pygame.K_e:
+                        for theEnemy in self.enemies:
+                            if (theEnemy.x == self.player.x + 1 or theEnemy.x == self.player.x - 1) and (
+                                    theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1):
+                                self.enemies.remove(theEnemy)
+                                self.player.receivePoints(50)
+                        self.calculateCPUMovement()
 
             # Refreshes window if size changes
             if event.type == pygame.VIDEORESIZE:
@@ -129,8 +129,10 @@ class GraphicsWindow:
 
     def drawText(self):
         font = pygame.font.SysFont('Tahoma', self.fontSize)
-
-        health = font.render('Health: ' + str(self.player.health), True, (255, 255, 0))
+        if self.player.isDead:
+            health = font.render('You Died', True, (255, 0, 0))
+        else:
+            health = font.render('Health: ' + str(self.player.health), True, (255, 255, 0))
         self.surface.blit(health, (0 + self.tileSize / 4, self.tileSize * self.divFactor))
 
         score = font.render('Score: ' + str(self.player.score), True, (255, 255, 0))
@@ -148,7 +150,10 @@ class GraphicsWindow:
 
     def drawPlayer(self):
         rect = pygame.Rect(self.player.x * self.tileSize, self.player.y * self.tileSize, self.tileSize, self.tileSize)
-        pygame.draw.rect(self.surface, colors.green, rect)
+        if not self.player.isDead:
+            pygame.draw.rect(self.surface, colors.green, rect)
+        else:
+            pygame.draw.rect(self.surface, colors.purple, rect)
 
     def drawEnemies(self):
         for theEnemy in self.enemies:
