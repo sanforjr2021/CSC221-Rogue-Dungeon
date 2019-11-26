@@ -5,20 +5,28 @@ import pygame
 import enemy
 import random
 
+import tile
+
 
 class GraphicsWindow:
 
     def __init__(self):
         pygame.init()
-
         self.createWindow()
 
         # The factor at which the tiles are divided from the window size
         self.divFactor = 10
 
         self.player = player.Player(0, 0, 0, 3)
+        self.walls = []
+        self.loots = []
         self.enemies = []
-        self.generateEnemies(4)
+        # Generation
+        self.generateWalls(8)
+        self.generatePlayer()
+        self.generateLoot(5)
+        self.generateEnemies(6)
+
         while True:
             self.calculateTileSize()
             self.calculateFontSize()
@@ -72,29 +80,46 @@ class GraphicsWindow:
                 if not self.player.isDead:  # Check if player is not dead
                     # Moves player to the right as long as they are within the grid boundaries
                     if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
+                        for theWall in self.walls:
+                            if theWall.x == self.player.x+1 and theWall.y == self.player.y:
+                                self.calculateCPUMovement()
+                                return
                         self.player.moveRight()
                         self.calculateCPUMovement()
                     # Moves player to the left as long as they are within the grid boundaries
                     if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and self.player.x > 0:
+                        for theWall in self.walls:
+                            if theWall.x == self.player.x-1 and theWall.y == self.player.y:
+                                self.calculateCPUMovement()
+                                return
                         self.player.moveLeft()
                         self.calculateCPUMovement()
                     # Moves player up as long as they are within the grid boundaries
                     if (event.key == pygame.K_UP or event.key == pygame.K_w) and self.player.y > 0:
+                        for theWall in self.walls:
+                            if theWall.x == self.player.x and theWall.y == self.player.y - 1:
+                                self.calculateCPUMovement()
+                                return
                         self.player.moveUp()
                         self.calculateCPUMovement()
                     # Moves player down as long as they are within the grid boundaries
                     if (event.key == pygame.K_DOWN or event.key == pygame.K_s) and self.player.y < self.divFactor - 1:
+                        for theWall in self.walls:
+                            if theWall.x == self.player.x and theWall.y == self.player.y + 1:
+                                self.calculateCPUMovement()
+                                return
                         self.player.moveDown()
                         self.calculateCPUMovement()
                     # The player attacks any target in each direction touching him
                     if event.key == pygame.K_e:
                         self.calculateCPUMovement()
                         for theEnemy in self.enemies:
-                            if (theEnemy.x == self.player.x + 1 or theEnemy.x == self.player.x - 1 or theEnemy.x == self.player.x)\
-                                    and (theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1 or theEnemy.y == self.player.y):
+                            if (
+                                    theEnemy.x == self.player.x + 1 or theEnemy.x == self.player.x - 1 or theEnemy.x == self.player.x) \
+                                    and (
+                                    theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1 or theEnemy.y == self.player.y):
                                 self.enemies.remove(theEnemy)
                                 self.player.receivePoints(50)
-
 
             # Refreshes window if size changes
             if event.type == pygame.VIDEORESIZE:
@@ -102,17 +127,23 @@ class GraphicsWindow:
 
     def calculateCPUMovement(self):
         for theEnemy in self.enemies:
-            # Move the enemy
             try:
                 x = theEnemy.x
                 y = theEnemy.y
                 theEnemy.randomMovement()
+                # Stop the enemy from walking through another enemy
                 for theOtherEnemy in self.enemies:
                     if theEnemy.x == theOtherEnemy.x and theEnemy.y == theOtherEnemy.y and theEnemy != theOtherEnemy:
                         theEnemy.x = x
                         theEnemy.y = y
-                        raise StackedEnemyError
-            except StackedEnemyError:
+                        raise StackedObjectError
+                # Stop the enemy from walking into a wall
+                for theWall in self.walls:
+                    if theEnemy.x == theWall.x and theEnemy.y == theWall.y:
+                        theEnemy.x = x
+                        theEnemy.y = y
+                        raise StackedObjectError
+            except StackedObjectError:
                 print("Enemy moved on top of enemy in line 111")
                 pass
             # Detect if it hits the player
@@ -120,23 +151,83 @@ class GraphicsWindow:
                 self.enemies.remove(theEnemy)
                 self.player.hurtPlayer()
                 self.player.receivePoints(-100)
+            for theLoot in self.loots:
+                if theLoot.x == self.player.x and theLoot.y == self.player.y:
+                    self.player.receivePoints(theLoot.points)
+                    self.loots.remove(theLoot)
+    # =================================================== #
+    # Generation
+    # =================================================== #
+    def generateWalls(self, numOfWalls):
+        for x in range(numOfWalls):
+            try:
+                # Check to see if a wall generated on another wall
+                tempWall = tile.TileWall(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1))
+                for theWall in self.walls:
+                    if tempWall.x == theWall.x and tempWall.y == theWall.y:
+                        raise StackedObjectError
+                self.walls.append(tempWall)
+            except StackedObjectError:
+                print("Regenerating Wall")
+                self.generateWalls(1)
+
+    def generatePlayer(self):
+
+        try:
+            # Check to see if the player generated on a wall
+            for theWall in self.walls:
+                if self.player.x == theWall.x and self.player.y == theWall.y:
+                    raise StackedObjectError
+            self.player = player.Player(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), 0,
+                                        3)
+        except StackedObjectError:
+            print("Regenerating Player")
+            self.generatePlayer()
+
+    def generateLoot(self, numOfLoots):
+        for x in range(numOfLoots):
+            try:
+                tempLoot = tile.TileLoot(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1),
+                                         (random.randint(1, 12) * 25))
+                # Check to see if the loot generated ontop of the player
+                if self.player.x == tempLoot.x and self.player.y == tempLoot.y:
+                    raise StackedObjectError
+                # Check to see if the loot generated on the wall
+                for theWall in self.walls:
+                    if tempLoot.x == theWall.x and tempLoot.y == theWall.y:
+                        raise StackedObjectError
+                # Check to see if loot generated ontop of other loot.
+                for theLoot in self.loots:
+                    if tempLoot.x == theLoot.x and tempLoot.y == theLoot.y:
+                        raise StackedObjectError
+                self.loots.append(tempLoot)
+            except StackedObjectError:
+                print("Regenerating loot")
+                self.generateLoot(1)
 
     def generateEnemies(self, numOfEnemies):
         for x in range(numOfEnemies):
             try:
-                tempEnemy = enemy.Enemy(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), self.divFactor)
+                tempEnemy = enemy.Enemy(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1),
+                                        self.divFactor)
+                # Check to see if the enemy spawned on a wall
+                for theWall in self.walls:
+                    if tempEnemy.x == theWall.x and tempEnemy.y == theWall.y:
+                        raise StackedObjectError
                 # Check to see if the enemy spawned on the player
                 if tempEnemy.x == self.player.x and tempEnemy.y == self.player.y:
-                    raise StackedEnemyError
+                    raise StackedObjectError
                 # Check to see if the enemy spawned ontop of another enemy
                 for theEnemy in self.enemies:
                     if theEnemy.x == tempEnemy.x and theEnemy.y == tempEnemy.y:
-                        raise StackedEnemyError
+                        raise StackedObjectError
+
                 self.enemies.append(tempEnemy)
-            except StackedEnemyError:
+            except StackedObjectError:
                 # Force the program to regenerate an enemy in said spot.
-                print("Error generating an enemy from line 133")
+                print("Regenerating Enemy")
                 self.generateEnemies(1)
+
     # =======================================================#
     # DRAWING FUNCTIONS#
     # =======================================================#
@@ -145,9 +236,11 @@ class GraphicsWindow:
         # Background fill color
         self.surface.fill(colors.black)
         self.drawGrid()
+        self.drawLoots()
         self.drawPlayer()
         self.drawText()
         self.drawEnemies()
+        self.drawWalls()
 
     def drawText(self):
         font = pygame.font.SysFont('Tahoma', self.fontSize)
@@ -182,11 +275,21 @@ class GraphicsWindow:
             rect = pygame.Rect(theEnemy.x * self.tileSize, theEnemy.y * self.tileSize, self.tileSize, self.tileSize)
             pygame.draw.rect(self.surface, colors.red, rect)
 
+    def drawLoots(self):
+        for theLoot in self.loots:
+            rect = pygame.Rect(theLoot.x * self.tileSize, theLoot.y * self.tileSize, self.tileSize, self.tileSize)
+            pygame.draw.rect(self.surface, colors.yellow, rect)
+
+    def drawWalls(self):
+        for theWall in self.walls:
+            rect = pygame.Rect(theWall.x * self.tileSize, theWall.y * self.tileSize, self.tileSize, self.tileSize)
+            pygame.draw.rect(self.surface, colors.blue, rect)
+
 
 # =======================================================#
 # Exceptions
 # ========================================================#
 
-class StackedEnemyError(Exception):
+class StackedObjectError(Exception):
     """ An Exception to detect if an enemy was moved onto another enemy."""
     pass
