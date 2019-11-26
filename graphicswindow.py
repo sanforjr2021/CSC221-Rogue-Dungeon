@@ -17,20 +17,27 @@ class GraphicsWindow:
         # The factor at which the tiles are divided from the window size
         self.divFactor = 10
 
+        # Creates a player with initial values
         self.player = player.Player(0, 0, 0, 3)
+        
+        # Creates arrays to hold the walls, loot, and enemies
         self.walls = []
         self.loots = []
         self.enemies = []
-        # Generation
+        
+        # Generates walls, loot, enemies, and a player
         self.generateWalls(8)
         self.generatePlayer()
         self.generateLoot(5)
         self.generateEnemies(6)
 
+        # Continually runs the following as long as the game is running
         while True:
+            # Calculates how large GUI elements need to be
             self.calculateTileSize()
             self.calculateFontSize()
 
+            # Draws all objects
             self.draw()
 
             # Updates the objects being displayed
@@ -39,22 +46,22 @@ class GraphicsWindow:
             # Runs listeners for various inputs
             self.runListeners()
 
+    # Calculates the size of each tile by determining if the width or height is smallest
     def calculateTileSize(self):
-        # Calculates the size of each tile by determining if the width or height is smallest
         if self.surface.get_height() < self.surface.get_width():
             self.tileSize = self.surface.get_height() / (self.divFactor + 2)
         else:
             self.tileSize = self.surface.get_width() / self.divFactor
 
+    # Calculates the size of the font based on the window size
     def calculateFontSize(self):
-        # Calculates the size of the font based on the window size
         if self.surface.get_height() < self.surface.get_width():
             self.fontSize = int(self.surface.get_height() / self.divFactor / 1.5)
         else:
             self.fontSize = int(self.surface.get_width() / self.divFactor / 1.5)
 
+    # Create the window and changes settings
     def createWindow(self):
-        # Create the window and change settings
         self.surface = pygame.display.set_mode((350, 420), pygame.RESIZABLE)
         pygame.display.set_caption("Rogue Dungeon")
         try:
@@ -63,6 +70,7 @@ class GraphicsWindow:
         except pygame.error:
             print('Could not load logo')
 
+    # Adds listeners to detect user input
     def runListeners(self):
         # For loop to detect event changes
         for event in pygame.event.get():
@@ -77,7 +85,9 @@ class GraphicsWindow:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                if not self.player.isDead:  # Check if player is not dead
+                # Checks if player is not dead
+                # If they are not dead, they can move and the enemies move
+                if not self.player.isDead:
                     # Moves player to the right as long as they are within the grid boundaries
                     if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
                         for theWall in self.walls:
@@ -125,7 +135,9 @@ class GraphicsWindow:
             if event.type == pygame.VIDEORESIZE:
                 self.surface = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
 
+    # Chooses how the enemies should move
     def calculateCPUMovement(self):
+        # For every enemy
         for theEnemy in self.enemies:
             try:
                 x = theEnemy.x
@@ -146,11 +158,13 @@ class GraphicsWindow:
             except StackedObjectError:
                 print("Enemy moved on top of enemy in line 111")
                 pass
-            # Detect if it hits the player
+            # Detect if an enemy hits the player
+            # If so, the enemy dies, but the player is hurt and loses points
             if theEnemy.x == self.player.x and theEnemy.y == self.player.y:
                 self.enemies.remove(theEnemy)
                 self.player.hurtPlayer()
                 self.player.receivePoints(-100)
+            # If the player walks over the loot, they get points and the loot disappears
             for theLoot in self.loots:
                 if theLoot.x == self.player.x and theLoot.y == self.player.y:
                     self.player.receivePoints(theLoot.points)
@@ -158,6 +172,8 @@ class GraphicsWindow:
     # =================================================== #
     # Generation
     # =================================================== #
+    
+    # Randomly generate a number of walls
     def generateWalls(self, numOfWalls):
         for x in range(numOfWalls):
             try:
@@ -171,19 +187,19 @@ class GraphicsWindow:
                 print("Regenerating Wall")
                 self.generateWalls(1)
 
+    # Randomly generate the player character's position
     def generatePlayer(self):
-
         try:
             # Check to see if the player generated on a wall
             for theWall in self.walls:
                 if self.player.x == theWall.x and self.player.y == theWall.y:
                     raise StackedObjectError
-            self.player = player.Player(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), 0,
-                                        3)
+            self.player = player.Player(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), 0, 3)
         except StackedObjectError:
             print("Regenerating Player")
             self.generatePlayer()
 
+    # Randomly generate a number of loot items
     def generateLoot(self, numOfLoots):
         for x in range(numOfLoots):
             try:
@@ -205,6 +221,7 @@ class GraphicsWindow:
                 print("Regenerating loot")
                 self.generateLoot(1)
 
+    # Randomly generate a number of enemies
     def generateEnemies(self, numOfEnemies):
         for x in range(numOfEnemies):
             try:
@@ -228,10 +245,11 @@ class GraphicsWindow:
                 print("Regenerating Enemy")
                 self.generateEnemies(1)
 
-    # =======================================================#
-    # DRAWING FUNCTIONS#
-    # =======================================================#
+    # ======================================================= #
+    # DRAWING FUNCTIONS
+    # ======================================================= #
 
+    # Draw all items
     def draw(self):
         # Background fill color
         self.surface.fill(colors.black)
@@ -242,6 +260,7 @@ class GraphicsWindow:
         self.drawEnemies()
         self.drawWalls()
 
+    # Draws the text that displays if the player is dead, their points, and their health
     def drawText(self):
         font = pygame.font.SysFont('Tahoma', self.fontSize)
         if self.player.isDead:
@@ -252,9 +271,9 @@ class GraphicsWindow:
 
         score = font.render('Score: ' + str(self.player.score), True, (255, 255, 0))
         self.surface.blit(score, (0 + self.tileSize / 4, self.tileSize * self.divFactor + self.tileSize))
-
+    
+    # Draws a grid as the size of the divFactor
     def drawGrid(self):
-        # Draws a grid of specified size
         for y in range(self.divFactor):
             for x in range(self.divFactor):
                 rect = pygame.Rect(x * self.tileSize, y * self.tileSize, self.tileSize, self.tileSize)
@@ -263,6 +282,7 @@ class GraphicsWindow:
         rect = pygame.Rect(0, self.tileSize * self.divFactor, self.tileSize * self.divFactor, self.tileSize * 2)
         pygame.draw.rect(self.surface, colors.blue, rect, 1)
 
+    # Draws the player
     def drawPlayer(self):
         rect = pygame.Rect(self.player.x * self.tileSize, self.player.y * self.tileSize, self.tileSize, self.tileSize)
         if not self.player.isDead:
@@ -270,26 +290,36 @@ class GraphicsWindow:
         else:
             pygame.draw.rect(self.surface, colors.purple, rect)
 
+    # Draws all enemies
     def drawEnemies(self):
         for theEnemy in self.enemies:
             rect = pygame.Rect(theEnemy.x * self.tileSize, theEnemy.y * self.tileSize, self.tileSize, self.tileSize)
             pygame.draw.rect(self.surface, colors.red, rect)
 
+    # Draws all loot
     def drawLoots(self):
         for theLoot in self.loots:
             rect = pygame.Rect(theLoot.x * self.tileSize, theLoot.y * self.tileSize, self.tileSize, self.tileSize)
             pygame.draw.rect(self.surface, colors.yellow, rect)
 
+    # Draws all walls
     def drawWalls(self):
         for theWall in self.walls:
             rect = pygame.Rect(theWall.x * self.tileSize, theWall.y * self.tileSize, self.tileSize, self.tileSize)
             pygame.draw.rect(self.surface, colors.blue, rect)
 
 
-# =======================================================#
+# ======================================================== #
 # Exceptions
-# ========================================================#
+# ======================================================== #
 
 class StackedObjectError(Exception):
     """ An Exception to detect if an enemy was moved onto another enemy."""
     pass
+   
+
+   
+# Tells the user that they can't use this method and closes the program
+if __name__ == '__main__':
+    print("This file can't be run on its own. Please run main.py")
+    quit()

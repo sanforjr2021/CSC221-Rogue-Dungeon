@@ -12,6 +12,7 @@ aqua = (0, 255, 255)
 orange = (255, 128, 0)
 pink = (255, 0, 128)
 
+# Tells the user that they can't use this method and closes the program
 if __name__ == '__main__':
     print("This file can't be run on its own. Please run main.py")
     quit()
