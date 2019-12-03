@@ -10,15 +10,15 @@ import tile
 
 class GraphicsWindow:
 
-    def __init__(self):
+    def __init__(self, numWall=8, numHealth=3, numLoot=5, numEnemy=6, divFactor=10):
         pygame.init()
         self.createWindow()
 
         # The factor at which the tiles are divided from the window size
-        self.divFactor = 10
-
+        self.divFactor = divFactor
+        self.health = numHealth
         # Creates a player with initial values
-        self.player = player.Player(0, 0, 0, 3)
+        self.player = player.Player(0, 0, 0, self.health)
         
         # Creates arrays to hold the walls, loot, and enemies
         self.walls = []
@@ -26,10 +26,10 @@ class GraphicsWindow:
         self.enemies = []
         
         # Generates walls, loot, enemies, and a player
-        self.generateWalls(8)
+        self.generateWalls(numWall)
         self.generatePlayer()
-        self.generateLoot(5)
-        self.generateEnemies(6)
+        self.generateLoot(numLoot)
+        self.generateEnemies(numEnemy)
 
         # Continually runs the following as long as the game is running
         while True:
@@ -156,7 +156,6 @@ class GraphicsWindow:
                         theEnemy.y = y
                         raise StackedObjectError
             except StackedObjectError:
-                print("Enemy moved on top of enemy in line 111")
                 pass
             # Detect if an enemy hits the player
             # If so, the enemy dies, but the player is hurt and loses points
@@ -194,7 +193,7 @@ class GraphicsWindow:
             for theWall in self.walls:
                 if self.player.x == theWall.x and self.player.y == theWall.y:
                     raise StackedObjectError
-            self.player = player.Player(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), 0, 3)
+            self.player = player.Player(random.randint(0, self.divFactor - 1), random.randint(0, self.divFactor - 1), 0, self.health)
         except StackedObjectError:
             print("Regenerating Player")
             self.generatePlayer()

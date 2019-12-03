@@ -2,23 +2,29 @@
 # Date: 10/1/19
 # Description: Load the basic Code
 
-import pygame
 import graphicswindow
+
 
 class Main:
     # Creates a menu that the player can select
     def __init__(self):
+        self.numHealth = 3
+        self.numWall = 8
+        self.numLoot = 5
+        self.numEnemy = 6
+        self.divFactor = 10
         self.menu_map = {
-			"play": self.play,
-			"instructions": self.instructions,
-			"quit": self.quit,
-		}
-    
+            "play": self.play,
+            "instructions": self.instructions,
+            "options": self.options,
+            "quit": self.quit,
+        }
+
         # Prints the logo for the game
         print()
         self.printLogo()
         print()
-        
+
         # While the game is running, asks the player which menu option they want
         while True:
             self.printOptions()
@@ -32,11 +38,11 @@ class Main:
                 print()
             else:
                 func()
-    
+
     # Opens the graphics window for the game
     def play(self):
-        graphicswindow.GraphicsWindow()
-     
+        graphicswindow.GraphicsWindow(self.numWall, self.numHealth, self.numLoot, self.numEnemy, self.divFactor)
+
     # Displays the instructions for playing the game
     def instructions(self):
         print()
@@ -68,11 +74,68 @@ class Main:
         print()
         print("===============================================================================")
         print()
-        
+
     # Exits the game
     def quit(self):
         raise SystemExit()
-    
+
+    # Allows configuring of options
+    def options(self):
+        print()
+        print("===============================================================================")
+        print()
+        print("             Options")
+        print("   Player Health : " + str(self.numHealth))
+        print("   Number of Wall Tiles : " + str(self.numWall))
+        print("   Number of Enemies : " + str(self.numEnemy))
+        print("   Number of Loot Tiles : " + str(self.numLoot))
+        print("   Division Factor For Grid : " + str(self.divFactor))
+        print()
+        self.setNumHealth()
+        self.setNumWall()
+        self.setNumEnemy()
+        self.setNumLoot()
+        self.setDivFactor()
+        print()
+        print("===============================================================================")
+        print()
+
+    def setNumHealth(self):
+        try:
+            self.numHealth = int(input("Please type the number of Health the player should have:"))
+        except ValueError:
+            print("The value entered is not a string.")
+            self.setNumHealth()
+
+    def setNumWall(self):
+        try:
+            self.numWall = int(input("Please type the number of tiles to be walls:"))
+        except ValueError:
+            print("The value entered is not a string.")
+            self.setNumWall()
+
+    def setNumEnemy(self):
+        try:
+            self.numEnemy = int(input("Please type the number of Enemies you want to generate on the map:"))
+        except ValueError:
+            print("The value entered is not a string.")
+            self.setNumEnemy()
+
+    def setNumLoot(self):
+        try:
+            self.numLoot = int(input("Please type the number of loot tiles you want to generate on the map:"))
+        except ValueError:
+            print("The value entered is not a string.")
+            self.numLoot()
+
+    def setDivFactor(self):
+        try:
+            self.divFactor = int(input("Please type the number for the division factor for the grid :"))
+        except ValueError:
+            print("The value entered is not a string.")
+            self.setDivFactor()
+
+
     # Prints the game logo
     def printLogo(self):
         print("            ▄████████  ▄██████▄     ▄██████▄  ███    █▄     ▄████████ ")
@@ -95,15 +158,16 @@ class Main:
         print("████████▀  ████████▀   ▀█   █▀    ████████▀    ██████████  ▀██████▀   ▀█   █▀  ")
         print()
         print("                   Created by Alec Barker and Jacob Sanford                    ")
-    
+
     # Prints the menu options for the user to select
     def printOptions(self):
         print("                            Please enter a command:                            ")
         print("                                      Play                                     ")
         print("                                  Instructions                                 ")
+        print("                                     Options                                   ")
         print("                                      Quit                                     ")
-        
-        
+
+
 # Checks if the user has pygame installed
 # If so, it will run the program
 if __name__ == '__main__':
