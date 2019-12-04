@@ -1,3 +1,5 @@
+# Description: Contains data and functions related to the player character
+
 class Player:
     # Creates a player object with a certain position in the grid with a score and health
     def __init__(self, x, y, score, health):
@@ -38,7 +40,7 @@ class Player:
         self.score = self.score + amount
 
 
-# Tells the user that they can't use this method and closes the program
+# Tells the user that they can't use this file and closes the program
 if __name__ == '__main__':
     print("This file can't be run on its own. Please run main.py")
     quit()

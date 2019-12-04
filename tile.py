@@ -1,3 +1,5 @@
+# Description: Creates simple classes for stationary tiles
+
 class TileWall:
     # Creates a wall object that neither the player nor the enemies can pass through
     def __init__(self, x, y):
@@ -15,7 +17,7 @@ class TileLoot:
         
 
 
-# Tells the user that they can't use this method and closes the program
+# Tells the user that they can't use this file and closes the program
 if __name__ == '__main__':
     print("This file can't be run on its own. Please run main.py")
     quit()

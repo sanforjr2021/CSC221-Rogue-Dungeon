@@ -1,3 +1,5 @@
+# Description: Contains data and functions related to the enemies in the game
+
 import random
 
 class Enemy:
@@ -39,7 +41,7 @@ class Enemy:
         direction()
 
 
-# Tells the user that they can't use this method and closes the program
+# Tells the user that they can't use this file and closes the program
 if __name__ == '__main__':
     print("This file can't be run on its own. Please run main.py")
     quit()

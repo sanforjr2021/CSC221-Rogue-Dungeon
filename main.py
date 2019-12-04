@@ -1,9 +1,9 @@
+# Rogue Dungeon
 # By Jacob Sanford & Alec Barker
-# Date: 10/1/19
-# Description: Load the basic Code
+
+# Description: Acts as the main controller of the program
 
 import graphicswindow
-
 
 class Main:
     # Creates a menu that the player can select
@@ -79,12 +79,12 @@ class Main:
     def quit(self):
         raise SystemExit()
 
-    # Allows configuring of options
+    # Prints the default values and presents the user with prompts to enter their own values
     def options(self):
         print()
         print("===============================================================================")
         print()
-        print("             Options")
+        print("           Default Values")
         print("   Player Health : " + str(self.numHealth))
         print("   Number of Wall Tiles : " + str(self.numWall))
         print("   Number of Enemies : " + str(self.numEnemy))
@@ -100,39 +100,44 @@ class Main:
         print("===============================================================================")
         print()
 
+    # Sets the amount of health the player character will have
     def setNumHealth(self):
         try:
-            self.numHealth = int(input("Please type the number of Health the player should have:"))
+            self.numHealth = int(input("Please type the number of health points the player will have: "))
         except ValueError:
-            print("The value entered is not a string.")
+            print("The value entered is not an integer value.")
             self.setNumHealth()
 
+    # Sets the number of walls that will appear on the grid
     def setNumWall(self):
         try:
-            self.numWall = int(input("Please type the number of tiles to be walls:"))
+            self.numWall = int(input("Please type the number of tiles that will be walls: "))
         except ValueError:
-            print("The value entered is not a string.")
+            print("The value entered is not an integer value.")
             self.setNumWall()
 
+    # Sets the number of enemies that will appear on the grid
     def setNumEnemy(self):
         try:
-            self.numEnemy = int(input("Please type the number of Enemies you want to generate on the map:"))
+            self.numEnemy = int(input("Please type the number of enemies that will generate on the map: "))
         except ValueError:
-            print("The value entered is not a string.")
+            print("The value entered is not an integer value.")
             self.setNumEnemy()
 
+    # Sets the number of loot items that will appear on the grid
     def setNumLoot(self):
         try:
-            self.numLoot = int(input("Please type the number of loot tiles you want to generate on the map:"))
+            self.numLoot = int(input("Please type the number of loot items that will generate on the map: "))
         except ValueError:
-            print("The value entered is not a string.")
+            print("The value entered is not an integer value.")
             self.numLoot()
 
+    # Sets the divFactor of the grid, which determines the length and width of the grid
     def setDivFactor(self):
         try:
-            self.divFactor = int(input("Please type the number for the division factor for the grid :"))
+            self.divFactor = int(input("Please type the number that represents the length and width of the grid: "))
         except ValueError:
-            print("The value entered is not a string.")
+            print("The value entered is not an integer value.")
             self.setDivFactor()
 
 

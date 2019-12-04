@@ -1,12 +1,12 @@
+# Description: Displays the game window and the GUI-based objects
+
 import sys
 import colors
 import player
 import pygame
 import enemy
 import random
-
 import tile
-
 
 class GraphicsWindow:
 
@@ -318,7 +318,7 @@ class StackedObjectError(Exception):
    
 
    
-# Tells the user that they can't use this method and closes the program
+# Tells the user that they can't use this file and closes the program
 if __name__ == '__main__':
     print("This file can't be run on its own. Please run main.py")
     quit()
