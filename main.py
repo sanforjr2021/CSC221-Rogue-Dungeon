@@ -91,54 +91,125 @@ class Main:
         print("   Number of Loot Tiles : " + str(self.numLoot))
         print("   Division Factor For Grid : " + str(self.divFactor))
         print()
-        self.setNumHealth()
-        self.setNumWall()
-        self.setNumEnemy()
-        self.setNumLoot()
-        self.setDivFactor()
+        
+        self.healthDone = False
+        while not self.healthDone:
+            self.setNumHealth();
+        
+        print()
+        
+        self.spawnOptionsDone = False
+        while not self.spawnOptionsDone:
+            self.setSpawnOptions()
+        
         print()
         print("===============================================================================")
         print()
 
+    # Presents all the settings to the user
+    def setSpawnOptions(self):
+        self.wallsDone = False
+        while not self.wallsDone:
+            self.setNumWall()
+        
+        print()
+        
+        self.enemiesDone = False
+        while not self.enemiesDone:
+            self.setNumEnemy()
+        
+        print()
+        
+        self.lootDone = False
+        while not self.lootDone:
+            self.setNumLoot()
+        
+        print()
+        
+        self.divFactorDone = False
+        while not self.divFactorDone:
+            self.setDivFactor()
+        
+        area = self.divFactorTemp * self.divFactorTemp
+        
+        if self.numEnemiesTemp + self.numWallsTemp + 1 > area:
+            print()
+            print("There is not enough grid space to spawn everything you requested. Please")
+            print("decrease the number of walls and/or enemies, or increase the length/width")
+            print("of the grid.")
+            print()
+        elif self.numLootTemp + self.numWallsTemp + 1 > area:
+            print()
+            print("There is not enough grid space to spawn everything you requested. Please")
+            print("decrease the number of walls and/or loot items, or increase the length/")
+            print("width of the grid.")
+            print()
+        else:
+            self.numWall = self.numWallsTemp
+            self.numEnemy = self.numEnemiesTemp
+            self.numLoot = self.numLootTemp
+            self.divFactor = self.divFactorTemp
+            self.spawnOptionsDone = True
+
     # Sets the amount of health the player character will have
     def setNumHealth(self):
         try:
-            self.numHealth = int(input("Please type the number of health points the player will have: "))
+            possibleHealth = int(input("Please type the number of health points the player will have: "))
+            if possibleHealth <= 0:
+                print("The entered value is less than or equal to 0. This is not an acceptable health value.")
+            else:
+                self.numHealth = possibleHealth
+                self.healthDone = True
         except ValueError:
             print("The value entered is not an integer value.")
-            self.setNumHealth()
 
     # Sets the number of walls that will appear on the grid
     def setNumWall(self):
         try:
-            self.numWall = int(input("Please type the number of tiles that will be walls: "))
+            possibleWalls = int(input("Please type the number of tiles that will be walls: "))
+            if possibleWalls <= 0:
+                print("The entered value is less than or equal to 0. This is not an acceptable value.")
+            else:
+                self.numWallsTemp = possibleWalls
+                self.wallsDone = True
         except ValueError:
             print("The value entered is not an integer value.")
-            self.setNumWall()
 
     # Sets the number of enemies that will appear on the grid
     def setNumEnemy(self):
         try:
-            self.numEnemy = int(input("Please type the number of enemies that will generate on the map: "))
+            possibleEnemies = int(input("Please type the number of enemies that will generate on the map: "))
+            if possibleEnemies <= 0:
+                print("The entered value is less than or equal to 0. This is not an acceptable health value.")
+            else:
+                self.numEnemiesTemp = possibleEnemies
+                self.enemiesDone = True
         except ValueError:
             print("The value entered is not an integer value.")
-            self.setNumEnemy()
 
     # Sets the number of loot items that will appear on the grid
     def setNumLoot(self):
         try:
-            self.numLoot = int(input("Please type the number of loot items that will generate on the map: "))
+            possibleLoot = int(input("Please type the number of loot items that will generate on the map: "))
+            if possibleLoot <= 0:
+                print("The entered value is less than or equal to 0. This is not an acceptable health value.")
+            else:
+                self.numLootTemp = possibleLoot
+                self.lootDone = True
         except ValueError:
             print("The value entered is not an integer value.")
-            self.numLoot()
 
     # Sets the divFactor of the grid, which determines the length and width of the grid
     def setDivFactor(self):
         try:
-            self.divFactor = int(input("Please type the number that represents the length and width of the grid: "))
+            possibleDivFactor = int(input("Please type the number that represents the length and width of the grid: "))
+            if possibleDivFactor <= 0:
+                print("The entered value is less than or equal to 0. This is not an acceptable health value.")
+            else:
+                self.divFactorTemp = possibleDivFactor
+                self.divFactorDone = True
         except ValueError:
             print("The value entered is not an integer value.")
-            self.setDivFactor()
 
 
     # Prints the game logo
