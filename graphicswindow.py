@@ -17,8 +17,12 @@ class GraphicsWindow:
         # The factor at which the tiles are divided from the window size
         self.divFactor = divFactor
         self.health = numHealth
+        
         # Creates a player with initial values
         self.player = player.Player(0, 0, 0, self.health)
+        
+        # Sets a variable that the player has not won the game yet
+        self.hasWon = False
         
         # Creates arrays to hold the walls, loot, and enemies
         self.walls = []
@@ -85,9 +89,9 @@ class GraphicsWindow:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                # Checks if player is not dead
-                # If they are not dead, they can move and the enemies move
-                if not self.player.isDead:
+                # Checks if player is not dead or has not won yet
+                # If they are not dead or have already won, they can move and the enemies move
+                if not (self.player.isDead or self.hasWon):
                     # Moves player to the right as long as they are within the grid boundaries
                     if (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and self.player.x < self.divFactor - 1:
                         for theWall in self.walls:
@@ -130,6 +134,8 @@ class GraphicsWindow:
                                     theEnemy.y == self.player.y + 1 or theEnemy.y == self.player.y - 1 or theEnemy.y == self.player.y):
                                 self.enemies.remove(theEnemy)
                                 self.player.receivePoints(50)
+                    if not self.enemies:
+                        self.hasWon = True
 
             # Refreshes window if size changes
             if event.type == pygame.VIDEORESIZE:
@@ -163,6 +169,7 @@ class GraphicsWindow:
                 self.enemies.remove(theEnemy)
                 self.player.hurtPlayer()
                 self.player.receivePoints(-100)
+                
             # If the player walks over the loot, they get points and the loot disappears
             for theLoot in self.loots:
                 if theLoot.x == self.player.x and theLoot.y == self.player.y:
@@ -263,12 +270,14 @@ class GraphicsWindow:
     def drawText(self):
         font = pygame.font.SysFont('Tahoma', self.fontSize)
         if self.player.isDead:
-            health = font.render('You Died', True, (255, 0, 0))
+            health = font.render('You Died', True, colors.red)
+        elif self.hasWon:
+            health = font.render('You Won', True, colors.green)
         else:
-            health = font.render('Health: ' + str(self.player.health), True, (255, 255, 0))
+            health = font.render('Health: ' + str(self.player.health), True, colors.yellow)
         self.surface.blit(health, (0 + self.tileSize / 4, self.tileSize * self.divFactor))
 
-        score = font.render('Score: ' + str(self.player.score), True, (255, 255, 0))
+        score = font.render('Score: ' + str(self.player.score), True, colors.yellow)
         self.surface.blit(score, (0 + self.tileSize / 4, self.tileSize * self.divFactor + self.tileSize))
     
     # Draws a grid as the size of the divFactor
