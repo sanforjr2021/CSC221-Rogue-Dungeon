@@ -12,6 +12,7 @@ Created for the University of Mount Union's CSC 221: Intermediate Programming in
 4. The user will see a menu and be prompted for an input. They can type in:
 	- `Play` to play the game
 	- `Instructions` to read the gameplay instructions listed below
+    - `Settings` to change the settings of the game
 	- `Quit` to close out of the program
 
 ## Gameplay Instructions
@@ -22,6 +23,8 @@ The game remains static until you move the player character. This means that mon
 You will take damage by moving onto the same tile or staying within one tile of a monster. If you receive too much damage, your character will die and the game will end. Monsters have a chance to dodge or counter attack, so try to avoid attacking them in large groups.
 
 To collect loot, simply move the player character over top of the loot.
+
+To win, kill all monsters in the level.
 
 Objects:
 - Green Box  :  Player
